@@ -5,3 +5,5 @@ image0*
 classify_image_graph_def.pb
 models/
 *.npz
+*.PNG
+guided-diffusion/*.jpg

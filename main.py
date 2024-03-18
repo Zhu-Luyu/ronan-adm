@@ -8,7 +8,7 @@ import numpy as np
 import complexity
 import cv2
 
-# 首先，通过命令行参数解析器 argparse 定义了一些参数，如输入选择、距离度量、模型类型、学习率等。
+# 通过命令行参数解析器 argparse 定义了一些参数，如输入选择、距离度量、模型类型、学习率等。
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_selection", default="", type=str, help="The path of dev set.")
 parser.add_argument("--distance_metric", default="l2", type=str, help="The path of dev set.")
@@ -81,7 +81,9 @@ experiment_folder_path = create_experiment_folder(args.input_selection)
 for i in range(args.num_iter):
     start_time = time.time()
     print("step:",i)
-
+    
+    
+   
     # 使用 from_noise_to_image 函数将噪声转换为图像。
     # 计算重构图像和目标图像之间的损失。
     if args.mixed_precision:
@@ -91,7 +93,8 @@ for i in range(args.num_iter):
     else:
         image = from_noise_to_image(args,args.cur_model,cur_noise,args.model_type)
         loss = criterion(image0.detach(),image).mean()
-
+    print(f"image0:{image0.shape}")
+    print(f"image:{image.shape}")
     # 每隔 100 步保存当前重构的图像。
     if i%100==0:
         epoch_num_str=str(i)
