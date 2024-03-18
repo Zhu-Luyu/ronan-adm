@@ -4,3 +4,4 @@ image0*
 .DS_Store
 classify_image_graph_def.pb
 models/
+*.npz
