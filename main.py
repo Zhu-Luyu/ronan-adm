@@ -1,6 +1,6 @@
 import torch
 from torch.cuda.amp import GradScaler
-from inference_utils import SSIMLoss,psnr,lpips_fn,save_img_tensor
+from inference_utils import SSIMLoss,psnr,lpips_fn,save_img_tensor,save_image_to_experiment_folder,create_experiment_folder
 from inference_models import get_init_noise, get_model,from_noise_to_image
 from inference_image0 import get_image0
 import argparse
@@ -75,6 +75,8 @@ args.measure = float("inf")
 if args.mixed_precision:
     scaler = GradScaler()
     
+experiment_folder_path = create_experiment_folder(args.input_selection)
+    
 # 在每个迭代步骤中：
 for i in range(args.num_iter):
     start_time = time.time()
@@ -94,8 +96,9 @@ for i in range(args.num_iter):
     if i%100==0:
         epoch_num_str=str(i)
         with torch.no_grad():
-            save_img_tensor(image,"./result_imgs/image_cur_"+args.input_selection+"_"+args.distance_metric+"_"+str(args.lr)+"_bs"+str(args.bs)+epoch_num_str+"_"+".png")
-
+            file_name = f"image_cur_{args.input_selection}_{args.distance_metric}_{str(args.lr)}_bs{str(args.bs)}{epoch_num_str}.png"
+            save_image_to_experiment_folder(image, experiment_folder_path, file_name)
+            
     # 根据指定的策略（如 "min" 或 "mean"），更新最小损失值 args.measure。
     min_value = criterion(image0,image).mean(-1).mean(-1).mean(-1).min()
     mean_value = criterion(image0,image).mean()

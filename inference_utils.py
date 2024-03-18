@@ -7,6 +7,9 @@ from torchvision import transforms
 from piqa import SSIM
 import lpips
 
+import os
+import time
+
 """
 这段代码定义了几个函数和类，用于计算图像之间的相似性和质量度量。
 引入一些外部库和模块，如 torch、torchvision、piqa、lpips 等，用于图像处理和相似性度量的计算。
@@ -64,3 +67,21 @@ def save_img_tensor(img,name):
     #img = img.cpu().permute(0, 2, 3, 1).numpy()
     #img = ddim.numpy_to_pil(img)[0]
     #img.save(name)
+    
+def create_experiment_folder(input_selection):
+    """
+    创建一个新的文件夹，用于保存实验结果。文件夹名称包含实验的关键信息和开始时间。
+    """
+    experiment_start_time = time.strftime("%Y%m%d-%H%M%S")
+    folder_name = f"experiment_{input_selection}_{experiment_start_time}"
+    folder_path = os.path.join("./result_imgs", folder_name)
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+    return folder_path
+
+def save_image_to_experiment_folder(image, folder_path, file_name):
+    """
+    在指定的文件夹中保存图像。
+    """
+    save_path = os.path.join(folder_path, file_name)
+    save_img_tensor(image, save_path)
