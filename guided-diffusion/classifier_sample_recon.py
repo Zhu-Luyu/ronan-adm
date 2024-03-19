@@ -155,7 +155,7 @@ def main():
             # sample = sample.permute(0, 2, 3, 1)
             sample = sample.contiguous()
             
-            # logger.log(f"image0 shape:{image0.shape}") # torch.Size([1, 3, 1, 1])
+            # logger.log(f"image0 shape:{image0.shape}") 
             # logger.log(f"sample shape:{sample.shape}")
             loss = criterion(image0,sample).mean()
             
