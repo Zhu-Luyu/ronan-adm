@@ -111,7 +111,7 @@ def main():
         start_time = time.time()
         logger.log(f"step:{i}")
         
-        # if args.mixed_precision:
+        # 
         #     with torch.autocast(device_type='cuda', dtype=torch.float16):
             
         # 用于存储生成的图像和对应的标签。
@@ -135,29 +135,33 @@ def main():
             sample_fn = (
                 diffusion.p_sample_loop if not args.use_ddim else diffusion.ddim_sample_loop
             )
-            sample = sample_fn(
-                model_fn,
-                (args.batch_size, 3, args.image_size, args.image_size),
-                noise=cur_noise,
-                clip_denoised=args.clip_denoised,
-                model_kwargs=model_kwargs,
-                cond_fn=cond_fn,
-                device=dist_util.dev(),
-            )
             
-            # 保存每一次重建的图像
-            step_num_str=str(i)
-            file_name = f"image_{step_num_str}_{args.input_selection}_{args.distance_metric}_{str(args.lr)}.png"
-            image1 = (sample + 1) / 2
-            save_image_to_experiment_folder(image1, experiment_folder_path, file_name)
             
-            # sample = ((sample + 1) * 127.5).clamp(0, 255).to(th.uint8)
-            # sample = sample.permute(0, 2, 3, 1)
-            sample = sample.contiguous()
-            
-            # logger.log(f"image0 shape:{image0.shape}") 
-            # logger.log(f"sample shape:{sample.shape}")
-            loss = criterion(image0,sample).mean()
+            if args.mixed_precision:
+                logger.log("sample mixed_precision")
+                sample = sample_fn(
+                    model_fn,
+                    (args.batch_size, 3, args.image_size, args.image_size),
+                    noise=cur_noise,
+                    clip_denoised=args.clip_denoised,
+                    model_kwargs=model_kwargs,
+                    cond_fn=cond_fn,
+                    device=dist_util.dev(),
+                )
+                
+                # 保存每一次重建的图像
+                step_num_str=str(i)
+                file_name = f"image_{step_num_str}_{args.input_selection}_{args.distance_metric}_{str(args.lr)}.png"
+                image1 = (sample + 1) / 2
+                save_image_to_experiment_folder(image1, experiment_folder_path, file_name)
+                
+                # sample = ((sample + 1) * 127.5).clamp(0, 255).to(th.uint8)
+                # sample = sample.permute(0, 2, 3, 1)
+                # sample = sample.contiguous()
+                
+                # logger.log(f"image0 shape:{image0.shape}") # torch.Size([1, 3, 1, 1])
+                # logger.log(f"sample shape:{sample.shape}")
+                loss = criterion(image0,sample).mean()
             
             # 根据指定的策略（如 "min" 或 "mean"），更新最小损失值 args.measure。
             min_value = criterion(image0,sample).mean(-1).mean(-1).mean(-1).min()
@@ -171,6 +175,7 @@ def main():
             
             # 根据是否使用混合精度，使用相应的方式进行梯度计算和优化器更新。
             if args.mixed_precision:
+                logger.log("optimizer mixed_precision")
                 optimizer.zero_grad()
                 scaler.scale(loss).backward()
                 scaler.step(optimizer)
