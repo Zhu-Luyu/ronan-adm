@@ -114,7 +114,7 @@ def main(rank, world_size, experiment_folder_path, args):
     image0 = image0.detach()
     
     # 优化器
-    cur_noise = th.nn.Parameter(init_noise.clone().detach().requires_grad_(True)).cuda()
+    cur_noise = th.nn.Parameter(init_noise.clone().requires_grad_(True)).cuda()
     optimizer = th.optim.Adam([cur_noise], lr=args.lr)
     
     # 损失函数
@@ -181,7 +181,7 @@ def main(rank, world_size, experiment_folder_path, args):
                 # sample = sample.permute(0, 2, 3, 1)
                 # sample = sample.contiguous()
                 
-                # logger.log(f"image0 shape:{image0.shape}") # torch.Size([1, 3, 1, 1])
+                # logger.log(f"image0 shape:{image0.shape}")
                 # logger.log(f"sample shape:{sample.shape}")
                 loss = criterion(image0,sample).mean()
             

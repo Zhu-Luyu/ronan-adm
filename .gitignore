@@ -7,3 +7,4 @@ models/
 *.npz
 *.PNG
 guided-diffusion/*.jpg
+*.pkl

@@ -56,6 +56,7 @@ def from_noise_to_image(args,model,noise,model_type):
     elif model_type in ["styleganv2ada_cifar10"]:
         label = torch.zeros([noise.shape[0], model.c_dim]).cuda()
         image = model(noise, label, noise_mode='none')
+        print(f"styleganv2ada_cifar10 generate {image.shape}")
         image = (image / 2 + 0.5).clamp(0, 1)
         image = transforms.Resize(32)(image)
     elif model_type in ["vae_cifar10"]:

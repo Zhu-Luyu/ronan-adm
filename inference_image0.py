@@ -68,6 +68,7 @@ def get_image0(args):
 
         if args.dataset_index:
             cifar10_img = cifar10_np[args.dataset_index]
+            print(f"cifar10_img.shape={cifar10_img.shape}")
             cifar10_img_show = Image.fromarray(cifar10_img)
         else:
             cifar10_img = cifar10_np[5]
