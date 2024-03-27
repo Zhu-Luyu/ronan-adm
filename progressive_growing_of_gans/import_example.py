@@ -3,8 +3,12 @@ import numpy as np
 import tensorflow as tf
 import PIL.Image
 
+import os
+from my_utils import create_time_named_dir
+
 # Initialize TensorFlow session.
-tf.InteractiveSession()
+# tf.InteractiveSession()
+tf.compat.v1.InteractiveSession()
 
 # Import official CelebA-HQ networks.
 with open('karras2018iclr-lsun-bedroom-256x256.pkl', 'rb') as file:
@@ -27,6 +31,14 @@ images = Gs.run(latents, labels)
 images = np.clip(np.rint((images + 1.0) / 2.0 * 255.0), 0.0, 255.0).astype(np.uint8) # [-1,1] => [0,255]
 images = images.transpose(0, 2, 3, 1) # NCHW => NHWC
 
-# Save images as PNG.
+# # Save images as PNG.
+# for idx in range(images.shape[0]):
+#     PIL.Image.fromarray(images[idx], 'RGB').save('img%d.png' % idx)
+
+# 使用 my_utils 中的函数创建存储图像的目录
+save_dir = create_time_named_dir()
+
+# Save images as PNG in the specific directory.
 for idx in range(images.shape[0]):
-    PIL.Image.fromarray(images[idx], 'RGB').save('img%d.png' % idx)
+    save_path = os.path.join(save_dir, f'img{idx}.png')
+    PIL.Image.fromarray(images[idx], 'RGB').save(save_path)
